@@ -1,0 +1,681 @@
+/*
+ Theme Name:   GeneratePress Child
+ Template:     generatepress
+ Version:      1.0.0
+*/
+
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+/* =========================================
+   CSS Variable System
+   ========================================= */
+
+:root {
+  /* Typography */
+  --yw-font-family:          'Pretendard', -apple-system, BlinkMacSystemFont,
+                             "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif,
+                             "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --yw-font-size-sm:         0.8125rem;   /* 13px */
+  --yw-font-size-body:       1.0625rem;   /* 17px */
+  --yw-font-size-lg:         1.25rem;     /* 20px */
+  --yw-font-size-h5:         0.9375rem;   /* 15px */
+  --yw-font-size-h4:         1.125rem;    /* 18px */
+  --yw-font-size-h3:         1.375rem;    /* 22px */
+  --yw-font-size-h2:         1.625rem;    /* 26px */
+  --yw-font-size-h1:         clamp(1.75rem, 5vw, 2.625rem); /* 28–42px */
+
+  --yw-line-height-tight:    1.25;
+  --yw-line-height-body:     1.85;
+  --yw-line-height-loose:    2.0;
+
+  --yw-letter-spacing-title: -0.02em;
+  --yw-letter-spacing-body:  -0.01em;
+  --yw-letter-spacing-label:  0.04em;
+
+  /* Colors — Light */
+  --yw-color-bg:             #ffffff;
+  --yw-color-surface:        #f5f5f7;
+  --yw-color-surface-2:      #ebebed;
+  --yw-color-text:           #1a1a1a;
+  --yw-color-text-muted:     #666666;
+  --yw-color-accent:         #0071e3;
+  --yw-color-accent-bg:      #e8f0fe;
+  --yw-color-border:         #e5e5e5;
+  --yw-color-code-bg:        #f5f5f7;
+  --yw-color-code-inline-bg: #ebebed;
+  --yw-color-code-inline-fg: #d63384;
+
+  /* Hero */
+  --yw-hero-overlay:         rgba(0, 0, 0, 0.5);
+  --yw-hero-overlay-grad:    linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%);
+
+  /* Category fallback gradients (썸네일 없을 때) */
+  --yw-gradient-ai-tools:    linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --yw-gradient-programs:    linear-gradient(135deg, #0f3460 0%, #533483 100%);
+  --yw-gradient-workflow:    linear-gradient(135deg, #1b4332 0%, #081c15 100%);
+  --yw-gradient-reviews:     linear-gradient(135deg, #3d0000 0%, #1a0000 100%);
+  --yw-gradient-default:     linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+
+  /* Layout */
+  --yw-container-width:  720px;
+  --yw-header-height:    60px;
+  --yw-hero-height:      520px;
+  --yw-hero-height-min:  300px;
+
+  /* Spacing */
+  --yw-space-xs:  0.5rem;    /* 8px */
+  --yw-space-sm:  1rem;      /* 16px */
+  --yw-space-md:  1.5rem;    /* 24px */
+  --yw-space-lg:  3rem;      /* 48px */
+  --yw-space-xl:  5rem;      /* 80px */
+  --yw-spacing-section:  4rem;
+  --yw-spacing-content:  2rem;
+
+  /* Border radius */
+  --yw-radius-sm: 6px;
+  --yw-radius-md: 12px;
+  --yw-radius-lg: 18px;
+  --yw-radius-pill: 999px;
+}
+
+[data-theme="dark"] {
+  --yw-color-bg:             #0a0a0a;
+  --yw-color-surface:        #1a1a1a;
+  --yw-color-surface-2:      #2a2a2a;
+  --yw-color-text:           #f0f0f0;
+  --yw-color-text-muted:     #999999;
+  --yw-color-accent:         #409cff;
+  --yw-color-accent-bg:      #1a2d4a;
+  --yw-color-border:         #2a2a2a;
+  --yw-color-code-bg:        #1e1e20;
+  --yw-color-code-inline-bg: #2a2a2c;
+  --yw-color-code-inline-fg: #ff7eb6;
+}
+
+
+/* =========================================
+   Base
+   ========================================= */
+
+body {
+  font-family: var(--yw-font-family);
+  font-size:   var(--yw-font-size-body);
+  line-height: var(--yw-line-height-body);
+  letter-spacing: var(--yw-letter-spacing-body);
+  color:       var(--yw-color-text);
+  background:  var(--yw-color-bg);
+}
+
+/* =========================================
+   Markdown Base Styles
+   -----------------------------------------
+   모든 규칙은 .entry-content 하위로 스코핑.
+   GeneratePress 기본 스타일과의 충돌 방지 +
+   포스트 본문 영역에만 선택적 적용.
+   ========================================= */
+
+/* ── 제목 (h1~h5) ──────────────────────────
+   공통 폰트/간격을 한 번에 선언하고
+   각 레벨별 font-size만 개별 지정.
+   margin-top 은 --yw-space-lg 로 섹션 구분,
+   margin-bottom 은 --yw-space-sm 으로 본문과 밀착.
+   ─────────────────────────────────────────── */
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5 {
+  font-family:     var(--yw-font-family);
+  font-weight:     700;
+  line-height:     var(--yw-line-height-tight);
+  letter-spacing:  var(--yw-letter-spacing-title);
+  color:           var(--yw-color-text);
+  margin-top:      var(--yw-space-lg);
+  margin-bottom:   var(--yw-space-sm);
+}
+
+.entry-content h1 { font-size: var(--yw-font-size-h1); }
+.entry-content h2 { font-size: var(--yw-font-size-h2); }
+.entry-content h3 { font-size: var(--yw-font-size-h3); }
+.entry-content h4 { font-size: var(--yw-font-size-h4); }
+.entry-content h5 { font-size: var(--yw-font-size-h5); }
+
+/* ── 단락 ───────────────────────────────────
+   단락 사이 여백은 --yw-space-md 기준.
+   ─────────────────────────────────────────── */
+.entry-content p {
+  margin-bottom: var(--yw-space-md);
+}
+
+/* ── 인라인 강조 ────────────────────────────
+   strong: 굵게 + 본문색 유지
+   em:     이탤릭 + 흐린 색으로 시각적 구분
+   ─────────────────────────────────────────── */
+.entry-content strong {
+  font-weight: 700;
+  color: var(--yw-color-text);
+}
+
+.entry-content em {
+  font-style: italic;
+  color: var(--yw-color-text-muted);
+}
+
+/* ── 링크 ───────────────────────────────────
+   accent 색상 + underline offset 으로 가독성 확보.
+   hover 시 opacity 로 피드백.
+   ─────────────────────────────────────────── */
+.entry-content a {
+  color: var(--yw-color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.15s;
+}
+
+.entry-content a:hover {
+  opacity: 0.75;
+}
+
+/* ── 이미지 ─────────────────────────────────
+   max-width 100% 로 반응형 보장.
+   border-radius 로 모서리 처리.
+   ─────────────────────────────────────────── */
+.entry-content img {
+  max-width: 100%;
+  border-radius: var(--yw-radius-md);
+  margin: var(--yw-space-xs) 0 var(--yw-space-md);
+}
+
+/* ── 인용구 (blockquote) ────────────────────
+   왼쪽 accent 컬러 border + 연한 배경.
+   이탤릭 + muted 색상으로 본문과 구분.
+   ─────────────────────────────────────────── */
+.entry-content blockquote {
+  border-left: 3px solid var(--yw-color-accent);
+  margin: 0 0 var(--yw-space-md);
+  padding: var(--yw-space-sm) var(--yw-space-md);
+  background: var(--yw-color-accent-bg);
+  border-radius: 0 var(--yw-radius-sm) var(--yw-radius-sm) 0;
+  color: var(--yw-color-text-muted);
+  font-style: italic;
+}
+
+/* ── 코드 블록 (pre > code) ─────────────────
+   모노스페이스 폰트, 회색 배경, 가로 스크롤 허용.
+   ─────────────────────────────────────────── */
+.entry-content pre {
+  background:    var(--yw-color-code-bg);
+  border-radius: var(--yw-radius-md);
+  padding:       var(--yw-space-md) var(--yw-space-lg);
+  overflow-x:    auto;
+  font-size:     0.875rem;
+  line-height:   1.7;
+  margin-bottom: var(--yw-space-md);
+  font-family:   'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+/* ── 인라인 코드 (:not(pre) > code) ─────────
+   pre 안의 code 는 제외하고 인라인만 적용.
+   분홍 계열 색상으로 코드임을 즉시 인식 가능.
+   ─────────────────────────────────────────── */
+.entry-content :not(pre) > code {
+  background:    var(--yw-color-code-inline-bg);
+  color:         var(--yw-color-code-inline-fg);
+  padding:       2px 6px;
+  border-radius: var(--yw-radius-sm);
+  font-size:     0.875rem;
+  font-family:   'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+/* ── 구분선 (hr) ────────────────────────────
+   border 제거 후 ::after 로 '* * *' 텍스트 표시.
+   ─────────────────────────────────────────── */
+.entry-content hr {
+  border:         none;
+  text-align:     center;
+  color:          var(--yw-color-border);
+  margin:         var(--yw-space-lg) 0;
+  letter-spacing: 8px;
+}
+
+.entry-content hr::after {
+  content: '* * *';
+}
+
+/* ── 목록 (ul / ol) ─────────────────────────
+   padding-left 로 들여쓰기 너비 조정.
+   기본 브라우저 값(40px)보다 좁게 설정.
+   ─────────────────────────────────────────── */
+.entry-content ul,
+.entry-content ol {
+  padding-left:  0.75em; /* 기존 1.5em → 절반으로 축소 */
+  margin-bottom: var(--yw-space-md);
+}
+
+.entry-content li {
+  margin-bottom: var(--yw-space-xs);
+}
+
+/* =========================================
+   Header
+   ========================================= */
+
+.yw-header {
+  position:   fixed;
+  top:        0;
+  left:       0;
+  right:      0;
+  z-index:    1000;
+  height:     var(--yw-header-height);
+
+  background:      transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom:   1px solid transparent;
+
+  transition:
+    background      0.35s ease,
+    backdrop-filter 0.35s ease,
+    -webkit-backdrop-filter 0.35s ease,
+    border-color    0.35s ease;
+}
+
+.yw-header.is-sticky {
+  background:      rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom:   1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .yw-header.is-sticky {
+  background:    rgba(10, 10, 10, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.yw-header-inner {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  height:          100%;
+  max-width:       calc(var(--yw-container-width) + 4rem);
+  margin:          0 auto;
+  padding:         0 2rem;
+}
+
+.yw-header-logo {
+  font-size:      1rem;
+  font-weight:    700;
+  letter-spacing: var(--yw-letter-spacing-title);
+  color:          #ffffff;
+  text-decoration: none;
+  transition:     color 0.35s ease;
+}
+
+.yw-header.is-sticky .yw-header-logo {
+  color: var(--yw-color-text);
+}
+
+.yw-header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--yw-space-md);
+}
+
+.yw-header-nav-link {
+  font-size:      var(--yw-font-size-sm);
+  font-weight:    500;
+  letter-spacing: var(--yw-letter-spacing-label);
+  color:          rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition:     color 0.35s ease, opacity 0.2s ease;
+}
+
+.yw-header-nav-link:hover {
+  opacity: 0.65;
+}
+
+.yw-header.is-sticky .yw-header-nav-link {
+  color: var(--yw-color-text);
+}
+
+/* Theme toggle button */
+.yw-theme-toggle {
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  width:            36px;
+  height:           36px;
+  padding:          0;
+  margin-left:      var(--yw-space-xs);
+  background:       rgba(255, 255, 255, 0.15);
+  border:           1px solid rgba(255, 255, 255, 0.25);
+  border-radius:    var(--yw-radius-pill);
+  color:            rgba(255, 255, 255, 0.9);
+  cursor:           pointer;
+  transition:       background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  flex-shrink:      0;
+}
+
+.yw-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.yw-header.is-sticky .yw-theme-toggle {
+  background:   var(--yw-color-surface);
+  border-color: var(--yw-color-border);
+  color:        var(--yw-color-text);
+}
+
+.yw-header.is-sticky .yw-theme-toggle:hover {
+  background: var(--yw-color-surface-2);
+}
+
+.yw-theme-toggle svg {
+  width:  18px;
+  height: 18px;
+  fill:   none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+/* 아이콘 전환 */
+.yw-theme-toggle .icon-moon { display: block; }
+.yw-theme-toggle .icon-sun  { display: none; }
+
+[data-theme="dark"] .yw-theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .yw-theme-toggle .icon-sun  { display: block; }
+
+/* =========================================
+   Single Post Template
+   ========================================= */
+
+.yw-single-wrap {
+  width:      100%;
+  background: var(--yw-color-bg);
+}
+
+/* --- Hero --- */
+
+.yw-single-hero {
+  position:            relative;
+  width:               100vw;
+  margin-left:         calc(50% - 50vw);
+  min-height:          var(--yw-hero-height-min);
+  height:              var(--yw-hero-height);
+  display:             flex;
+  align-items:         flex-end;
+  background-image:    var(--yw-gradient-default);
+  background-size:     cover;
+  background-position: center;
+  background-repeat:   no-repeat;
+  overflow:            hidden;
+}
+
+.yw-single-hero.has-thumbnail {
+  background-size:     cover;
+  background-position: center;
+}
+
+/* Category fallback gradients */
+.yw-single-hero.cat-ai-tools   { background: var(--yw-gradient-ai-tools); }
+.yw-single-hero.cat-programs   { background: var(--yw-gradient-programs); }
+.yw-single-hero.cat-workflow   { background: var(--yw-gradient-workflow); }
+.yw-single-hero.cat-reviews    { background: var(--yw-gradient-reviews); }
+
+.yw-single-hero-overlay {
+  position:   absolute;
+  inset:      0;
+  background: var(--yw-hero-overlay-grad);
+}
+
+.yw-single-hero-content {
+  position:   relative;
+  z-index:    1;
+  width:      100%;
+  max-width:  calc(var(--yw-container-width) + 4rem);
+  margin:     0 auto;
+  padding:    0 2rem var(--yw-space-lg);
+}
+
+.yw-single-emoji {
+  font-size:     3.5rem;
+  line-height:   1;
+  margin-bottom: var(--yw-space-sm);
+  user-select:   none;
+}
+
+.yw-single-meta {
+  display:     flex;
+  align-items: center;
+  flex-wrap:   wrap;
+  gap:         var(--yw-space-xs);
+  margin-bottom: var(--yw-space-sm);
+}
+
+.yw-single-cat {
+  font-size:   var(--yw-font-size-sm);
+  font-weight: 600;
+  letter-spacing: var(--yw-letter-spacing-label);
+  color:       #fff;
+  background:  rgba(255,255,255,0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border:      1px solid rgba(255,255,255,0.3);
+  padding:     3px 12px;
+  border-radius: var(--yw-radius-pill);
+  text-decoration: none;
+  transition:  background 0.2s;
+}
+
+.yw-single-cat:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+.yw-single-date,
+.yw-single-readtime {
+  font-size: var(--yw-font-size-sm);
+  color:     rgba(255,255,255,0.75);
+}
+
+.yw-single-date::before,
+.yw-single-readtime::before {
+  content:      '·';
+  margin-right: var(--yw-space-xs);
+  opacity:      0.5;
+}
+
+.yw-single-title {
+  font-size:      var(--yw-font-size-h1);
+  font-weight:    800;
+  line-height:    var(--yw-line-height-tight);
+  letter-spacing: var(--yw-letter-spacing-title);
+  color:          #ffffff;
+  margin:         0 0 var(--yw-space-sm);
+  text-shadow:    0 2px 12px rgba(0,0,0,0.3);
+}
+
+.yw-single-hero-tags {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       var(--yw-space-xs);
+}
+
+.yw-single-hero-tag {
+  font-size:    var(--yw-font-size-sm);
+  font-weight:  500;
+  color:        rgba(255,255,255,0.8);
+  background:   rgba(255,255,255,0.12);
+  border:       1px solid rgba(255,255,255,0.2);
+  padding:      2px 10px;
+  border-radius: var(--yw-radius-pill);
+  text-decoration: none;
+  transition:   background 0.2s;
+}
+
+.yw-single-hero-tag:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+/* --- Body Container --- */
+
+.yw-single-container {
+  width:     100%;
+  max-width: var(--yw-container-width);
+  margin:    0 auto;
+  padding:   var(--yw-space-xl) var(--yw-space-md);
+}
+
+/* --- Author --- */
+
+.yw-single-author {
+  display:     flex;
+  align-items: flex-start;
+  gap:         var(--yw-space-md);
+  margin-top:  var(--yw-space-lg);
+  padding:     var(--yw-space-md);
+  background:  var(--yw-color-surface);
+  border-radius: var(--yw-radius-lg);
+}
+
+.yw-single-author-avatar {
+  width:        52px !important;
+  height:       52px !important;
+  border-radius: 50% !important;
+  flex-shrink:  0;
+}
+
+.yw-single-author-info {
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+}
+
+.yw-single-author-name {
+  font-size:   0.9375rem;
+  font-weight: 700;
+  color:       var(--yw-color-text);
+}
+
+.yw-single-author-bio {
+  font-size:   0.875rem;
+  color:       var(--yw-color-text-muted);
+  line-height: 1.6;
+  margin:      0;
+}
+
+/* =========================================
+   TOC (Table of Contents)
+   =========================================
+   - position: fixed 으로 본문 우측에 고정
+   - 본문 컨테이너(720px) 중앙 기준으로 오른쪽에 배치
+   - 1280px 이하에서 display: none (본문 공간 보호)
+   ========================================= */
+
+.yw-toc {
+  /* 헤더 아래 + 여백에서 시작 */
+  position:   fixed;
+  top:        calc(var(--yw-header-height) + var(--yw-space-lg));
+
+  /* 본문(720px) 중앙 기준 오른쪽 배치: 50% + 360px(본문 반폭) + 32px 간격 */
+  left:       calc(50% + 392px);
+
+  width:      180px;
+  max-height: calc(100vh - var(--yw-header-height) - var(--yw-space-xl));
+  overflow-y: auto;
+
+  /* 스크롤바 숨김 (접근성 유지하면서 시각적으로 제거) */
+  scrollbar-width: none;
+
+  /* 기본 숨김 — 히어로 영역 벗어나면 JS가 is-visible 클래스 추가 */
+  opacity:        0;
+  pointer-events: none;
+  transition:     opacity 0.3s ease;
+}
+.yw-toc::-webkit-scrollbar { display: none; }
+
+/* 히어로 하단을 지난 후 표시 */
+.yw-toc.is-visible {
+  opacity:        1;
+  pointer-events: auto;
+}
+
+/* TOC 제목 */
+.yw-toc-title {
+  font-size:      var(--yw-font-size-sm);
+  font-weight:    700;
+  letter-spacing: var(--yw-letter-spacing-label);
+  color:          var(--yw-color-text-muted);
+  text-transform: uppercase;
+  margin:         0 0 var(--yw-space-sm);
+}
+
+/* 목록 초기화 */
+.yw-toc-list {
+  list-style: none;
+  margin:     0;
+  padding:    0;
+}
+
+/* TOC 항목 공통 */
+.yw-toc-item {
+  margin-bottom: 2px;
+}
+
+/* h3 항목은 h2보다 들여쓰기 */
+.yw-toc-h3 {
+  padding-left: var(--yw-space-sm);
+}
+
+/* TOC 링크 */
+.yw-toc-link {
+  display:     block;
+  font-size:   0.8125rem;  /* 13px */
+  line-height: 1.5;
+  color:       var(--yw-color-text-muted);
+  text-decoration: none;
+  padding:     4px 0 4px 10px;
+  border-left: 2px solid transparent;
+  transition:  color 0.2s ease, border-color 0.2s ease;
+  word-break:  keep-all;
+}
+
+.yw-toc-link:hover {
+  color: var(--yw-color-text);
+}
+
+/* 현재 섹션 활성 상태 (JS에서 is-active 클래스 토글) */
+.yw-toc-link.is-active {
+  color:        var(--yw-color-accent);
+  font-weight:  600;
+  border-color: var(--yw-color-accent);
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+
+@media (max-width: 768px) {
+  .yw-single-hero {
+    height: calc(var(--yw-hero-height) * 0.75);
+  }
+
+  .yw-single-hero-content {
+    padding: 0 var(--yw-space-md) var(--yw-space-md);
+  }
+
+  .yw-single-container {
+    padding: var(--yw-space-lg) var(--yw-space-md);
+  }
+
+  .entry-content pre {
+    padding: var(--yw-space-sm) var(--yw-space-md);
+  }
+}
+
+/* TOC: 1280px 이하에서 숨김 */
+@media (max-width: 1280px) {
+  .yw-toc { display: none; }
+}

@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# Drafts / backups
+style copy.css
+*.bak
+*.orig
+*.tmp
+
+# Reference / design files
+*_reference.html
+*_reference.*
+
+# Logs
+*.log
+
+# Node (just in case)
+node_modules/
+npm-debug.log*
+
+# WordPress auto-generated
+error_log
