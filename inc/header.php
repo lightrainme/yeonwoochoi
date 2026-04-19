@@ -19,8 +19,8 @@ function yw_render_header() {
 	<header class="yw-header" id="yw-header" role="banner">
 		<div class="yw-header-inner">
 
-			<a href="<?php echo esc_url( $site_url ); ?>" class="yw-header-logo" aria-label="<?php echo esc_attr( $site_name ); ?>">
-				<?php echo esc_html( $site_name ); ?>
+			<a href="<?php echo home_url(); ?>" class="yw-header-logo">
+				<?php include get_stylesheet_directory() . '/assets/img/logo.svg'; ?>
 			</a>
 
 			<nav class="yw-header-nav" aria-label="Primary navigation">

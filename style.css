@@ -33,7 +33,7 @@
   --yw-letter-spacing-label:  0.04em;
 
   /* Colors — Light */
-  --yw-color-bg:             #ffffff;
+  --yw-color-bg:             #fafaf8;
   --yw-color-surface:        #f5f5f7;
   --yw-color-surface-2:      #ebebed;
   --yw-color-text:           #1a1a1a;
@@ -131,7 +131,7 @@ body {
   letter-spacing:  var(--yw-letter-spacing-title);
   color:           var(--yw-color-text);
   margin-top:      var(--yw-space-lg);
-  margin-bottom:   var(--yw-space-sm);
+  margin-bottom:   var(--yw-space-md);
 }
 
 .entry-content h1 { font-size: var(--yw-font-size-h1); }
@@ -193,11 +193,14 @@ body {
 .entry-content blockquote {
   border-left: 3px solid var(--yw-color-accent);
   margin: 0 0 var(--yw-space-md);
-  padding: var(--yw-space-sm) var(--yw-space-md);
-  background: var(--yw-color-accent-bg);
-  border-radius: 0 var(--yw-radius-sm) var(--yw-radius-sm) 0;
+  padding: var(--yw-space-md) 1.5rem;
+  background: #f5f5f7;
+  border-radius: 0 .5rem .5rem 0;
+  box-sizing: border-box;
   color: var(--yw-color-text-muted);
   font-style: italic;
+  font-size: 0.95rem;
+  word-break: keep-all;
 }
 
 /* ── 코드 블록 (pre > code) ─────────────────
@@ -281,15 +284,15 @@ body {
 }
 
 .yw-header.is-sticky {
-  background:      rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom:   1px solid rgba(0, 0, 0, 0.08);
+  background:      rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom:   1px solid rgba(255, 255, 255, 0.25);
 }
 
 [data-theme="dark"] .yw-header.is-sticky {
-  background:    rgba(10, 10, 10, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background:    rgba(10, 10, 10, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .yw-header-inner {
@@ -309,6 +312,13 @@ body {
   color:          #ffffff;
   text-decoration: none;
   transition:     color 0.35s ease;
+  display:        flex;
+  align-items:    center;
+}
+
+.yw-header-logo svg {
+  width:  70px;
+  height: auto;
 }
 
 .yw-header.is-sticky .yw-header-logo {
@@ -612,8 +622,37 @@ body {
   margin:         0 0 var(--yw-space-sm);
 }
 
+/* 프로그레스 바 + 목록 나란히 배치 */
+.yw-toc-body {
+  display:     flex;
+  align-items: stretch;
+  gap:         10px;
+}
+
+/* 세로 프로그레스 바 트랙
+ * height: auto + align-self: stretch 으로 목록 높이에 자동 맞춤.
+ * JS가 .yw-toc-progress-bar의 height를 rAF + lerp로 부드럽게 갱신. */
+.yw-toc-progress-wrap {
+  position:      relative;
+  flex-shrink:   0;
+  width:         3px;
+  border-radius: var(--yw-radius-pill);
+  background:    var(--yw-color-surface-2);
+  overflow:      hidden;
+}
+
+/* 채움 바 */
+.yw-toc-progress-bar {
+  width:         100%;
+  height:        0%;
+  background:    var(--yw-color-accent);
+  border-radius: var(--yw-radius-pill);
+  transition:    height 0.15s ease-out;
+}
+
 /* 목록 초기화 */
 .yw-toc-list {
+  flex:       1;
   list-style: none;
   margin:     0;
   padding:    0;
@@ -629,16 +668,15 @@ body {
   padding-left: var(--yw-space-sm);
 }
 
-/* TOC 링크 */
+/* TOC 링크 — active border 제거, 좌측 패딩만 유지 */
 .yw-toc-link {
   display:     block;
-  font-size:   0.8125rem;  /* 13px */
+  font-size:   0.8125rem;
   line-height: 1.5;
   color:       var(--yw-color-text-muted);
   text-decoration: none;
   padding:     4px 0 4px 10px;
-  border-left: 2px solid transparent;
-  transition:  color 0.2s ease, border-color 0.2s ease;
+  transition:  color 0.2s ease;
   word-break:  keep-all;
 }
 
@@ -646,11 +684,10 @@ body {
   color: var(--yw-color-text);
 }
 
-/* 현재 섹션 활성 상태 (JS에서 is-active 클래스 토글) */
+/* active 상태: 색상·굵기만 (border 없음) */
 .yw-toc-link.is-active {
-  color:        var(--yw-color-accent);
-  font-weight:  600;
-  border-color: var(--yw-color-accent);
+  color:       var(--yw-color-accent);
+  font-weight: 600;
 }
 
 /* =========================================

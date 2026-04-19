@@ -126,15 +126,26 @@ get_header();
 			<?php if ( ! empty( $toc_items ) ) : ?>
 			<nav class="yw-toc" id="yw-toc" aria-label="목차">
 				<p class="yw-toc-title">목차</p>
-				<ol class="yw-toc-list">
+
+				<!-- 프로그레스 바 + 목록 나란히 배치 -->
+				<div class="yw-toc-body">
+
+					<!-- 세로 프로그레스 바: 본문 스크롤 0~100% / JS rAF + lerp 제어 -->
+					<div class="yw-toc-progress-wrap" id="yw-toc-progress-wrap">
+						<div class="yw-toc-progress-bar" id="yw-toc-progress-bar"></div>
+					</div>
+
+					<ol class="yw-toc-list">
 					<?php foreach ( $toc_items as $item ) : ?>
 					<li class="yw-toc-item yw-toc-h<?php echo $item['level']; ?>">
 						<a href="#<?php echo esc_attr( $item['id'] ); ?>" class="yw-toc-link">
 							<?php echo esc_html( $item['text'] ); ?>
 						</a>
 					</li>
-					<?php endforeach; ?>
-				</ol>
+						<?php endforeach; ?>
+					</ol>
+
+				</div><!-- /.yw-toc-body -->
 			</nav>
 			<?php endif; ?>
 
@@ -177,20 +188,22 @@ get_header();
  *    해당 TOC 링크에 is-active 클래스를 부여.
  */
 (function () {
-	var toc      = document.getElementById('yw-toc');
-	var hero     = document.querySelector('.yw-single-hero');
-	var headings = document.querySelectorAll('.yw-single-content h2[id], .yw-single-content h3[id]');
-	var tocLinks = document.querySelectorAll('.yw-toc-link');
+	var toc         = document.getElementById('yw-toc');
+	var hero        = document.querySelector('.yw-single-hero');
+	var progressBar = document.getElementById('yw-toc-progress-bar');
+	var content     = document.querySelector('.yw-single-content');
+	var tocLinks    = document.querySelectorAll('.yw-toc-link');
+
+	/* contentTop: 페이지 최상단 기준 절대 위치 — 스크롤과 무관하게 한 번만 캐싱 */
+	var contentTop = content ? content.offsetTop : 0;
 
 	if ( ! toc || ! hero ) return;
 
-	/* ── 1. 히어로 기준 TOC 가시성 제어 ── */
+	/* ── 1. 히어로 기준 TOC 가시성 제어 + 스크롤 프로그레스 바 ── */
 	var header = document.getElementById('yw-header');
 
 	function onScroll() {
-		/* 헤더 하단에 히어로 하단이 닿는 순간 TOC 표시
-		 * getBoundingClientRect().bottom 은 뷰포트 기준 실시간 값이므로
-		 * 헤더 높이와 직접 비교 가능 */
+		/* 헤더 하단에 히어로 하단이 닿는 순간 TOC 표시 */
 		var headerH    = header ? header.offsetHeight : 60;
 		var heroBottom = hero.getBoundingClientRect().bottom;
 
@@ -199,45 +212,53 @@ get_header();
 		} else {
 			toc.classList.remove('is-visible');
 		}
+
+		/* pct: 본문 내 스크롤 진행률 0~100 */
+		var pct = 0;
+		if ( content ) {
+			var scrollable = content.offsetHeight - window.innerHeight;
+			pct = scrollable > 0
+				? Math.max( 0, Math.min( 100, ( window.scrollY - contentTop ) / scrollable * 100 ) )
+				: 0;
+		}
+
+		/* 프로그레스 바 높이 갱신 */
+		if ( progressBar ) {
+			progressBar.style.height = pct.toFixed(2) + '%';
+		}
+
+		/* heading 위치 기반 TOC active */
+		if ( tocLinks.length ) {
+			var offset     = 200;
+			var activeLink = null;
+			if ( window.scrollY + window.innerHeight >= document.body.scrollHeight - 10 ) {
+				activeLink = tocLinks[ tocLinks.length - 1 ];
+			} else {
+				tocLinks.forEach( function ( link ) {
+					var id      = link.getAttribute('href').replace('#', '');
+					var heading = document.getElementById( id );
+					if ( heading && heading.getBoundingClientRect().top <= offset ) {
+						activeLink = link;
+					}
+				} );
+			}
+			tocLinks.forEach( function ( link ) {
+				link.classList.toggle( 'is-active', link === activeLink );
+			} );
+		}
 	}
 
 	window.addEventListener('scroll', onScroll, { passive: true });
-	onScroll(); /* 페이지 로드 시 초기 상태 즉시 반영 */
+	onScroll();
 
-	/* ── 2. Scroll Spy ── */
-	if ( ! headings.length || ! tocLinks.length ) return;
-
-	/* 링크 맵: id → anchor 엘리먼트 */
-	var linkMap = {};
-	tocLinks.forEach( function (link) {
-		linkMap[ link.getAttribute('href').replace('#', '') ] = link;
-	});
-
-	/* 현재 활성 링크 교체 */
-	function setActive(id) {
-		tocLinks.forEach( function (link) { link.classList.remove('is-active'); });
-		if ( linkMap[id] ) linkMap[id].classList.add('is-active');
-	}
-
-	var spyObserver = new IntersectionObserver(
-		function (entries) {
-			entries.forEach( function (entry) {
-				if ( entry.isIntersecting ) {
-					setActive( entry.target.getAttribute('id') );
-				}
-			});
-		},
-		{ rootMargin: '-15% 0px -75% 0px', threshold: 0 }
-	);
-
-	headings.forEach( function (h) { spyObserver.observe(h); });
-
-	/* 클릭 시 smooth scroll (헤더 높이 80px 오프셋) */
+	/* 클릭 시 smooth scroll + 즉시 active */
 	tocLinks.forEach( function (link) {
 		link.addEventListener('click', function (e) {
 			var target = document.getElementById( this.getAttribute('href').replace('#', '') );
 			if ( ! target ) return;
 			e.preventDefault();
+			tocLinks.forEach( function (l) { l.classList.remove('is-active'); } );
+			link.classList.add('is-active');
 			window.scrollTo({
 				top:      target.getBoundingClientRect().top + window.scrollY - 80,
 				behavior: 'smooth'
